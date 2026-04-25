@@ -1,0 +1,173 @@
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+WARNING: Using incubator modules: jdk.incubator.vector
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+26/04/25 21:28:46 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.61 instead (on interface eth0)
+26/04/25 21:28:46 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/04/25 21:28:47 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                          (0 + 2) / 2]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 0:=============================>                             (1 + 1) / 2]                                                                                [Stage 1:>                                                          (0 + 2) / 2]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 1:=============================>                             (1 + 1) / 2]                                                                                /workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 3:>                                                          (0 + 2) / 2]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 3:=============================>                             (1 + 1) / 2]                                                                                [Stage 17:>                                                         (0 + 2) / 2]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 17:=============================>                            (1 + 1) / 2][Stage 18:=============================>                            (1 + 1) / 2]                                                                                [Stage 19:>                                                         (0 + 2) / 2]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 19:=============================>                            (1 + 1) / 2]                                                                                [Stage 27:=============================>                            (1 + 1) / 2]                                                                                /workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 29:>                                                         (0 + 2) / 2][Stage 29:=============================>                            (1 + 1) / 2]                                                                                /workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 30:>                                                         (0 + 2) / 2][Stage 30:=============================>                            (1 + 1) / 2][Stage 31:=============================>                            (2 + 2) / 4]                                                                                /workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 33:>                                                         (0 + 1) / 1]                                                                                /workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 34:>                                                         (0 + 2) / 2][Stage 34:=============================>                            (1 + 1) / 2]                                                                                [Stage 44:>                                                         (0 + 2) / 4]/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+/workspaces/Mini-Project-2/src/rdd/main_queries.py:106: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  dt    = _dt.datetime.utcfromtimestamp(ts) if ts is not None else None
+[Stage 44:==============>                                           (1 + 2) / 4][Stage 44:=============================>                            (2 + 2) / 4][Stage 44:===========================================>              (3 + 1) / 4][Stage 45:>                                                         (0 + 1) / 1]                                                                                [Stage 47:>                                                         (0 + 2) / 3][Stage 47:===================>                                      (1 + 2) / 3][Stage 47:======================================>                   (2 + 1) / 3]                                                                                
+[START] Q1 — Complex Filter
+  Elite reviewers: 814
+[DONE]  Q1 — Complex Filter — 25.457s
+
+
+[START] Q2 — Aggregation (avg helpfulness per game)
+  appid=10  avg_helpfulness=0.174  total_reviews=22313  avg_playtime=34249.3  total_votes_up=26229
+  appid=20  avg_helpfulness=0.3047  total_reviews=2488  avg_playtime=6557.85  total_votes_up=12026
+  appid=30  avg_helpfulness=0.2511  total_reviews=1421  avg_playtime=8760.93  total_votes_up=3041
+  appid=40  avg_helpfulness=0.2762  total_reviews=744  avg_playtime=2301.17  total_votes_up=1781
+  appid=50  avg_helpfulness=0.153  total_reviews=5120  avg_playtime=1670.16  total_votes_up=5183
+  appid=60  avg_helpfulness=0.3097  total_reviews=1803  avg_playtime=2351.84  total_votes_up=7036
+  appid=70  avg_helpfulness=0.1534  total_reviews=23350  avg_playtime=2321.15  total_votes_up=31041
+  appid=80  avg_helpfulness=0.2011  total_reviews=4535  avg_playtime=7404.78  total_votes_up=6062
+  appid=130  avg_helpfulness=0.1692  total_reviews=3861  avg_playtime=790.48  total_votes_up=3770
+  appid=220  avg_helpfulness=0.0918  total_reviews=15298  avg_playtime=1812.07  total_votes_up=9268
+[DONE]  Q2 — Aggregation (avg helpfulness per game) — 21.720s
+
+
+[START] Q3 — Multi-Attribute Grouping (appid x voted_up)
+  appid=730  voted_up=True  count=859030  avg_help=0.1854  avg_play=66580.5  std=0.2469
+  appid=730  voted_up=False  count=117182  avg_help=0.2283  avg_play=58296.41  std=0.2533
+  appid=550  voted_up=True  count=100694  avg_help=0.1332  avg_play=10549.36  std=0.2274
+  appid=620  voted_up=True  count=86880  avg_help=0.1073  avg_play=2721.79  std=0.211
+  appid=400  voted_up=True  count=35312  avg_help=0.1026  avg_play=1141.97  std=0.208
+  appid=240  voted_up=True  count=26638  avg_help=0.1745  avg_play=20113.44  std=0.2469
+  appid=70  voted_up=True  count=22506  avg_help=0.1455  avg_play=2367.7  std=0.2366
+  appid=10  voted_up=True  count=21525  avg_help=0.167  avg_play=35104.02  std=0.2448
+  appid=1250  voted_up=True  count=18851  avg_help=0.1705  avg_play=11258.94  std=0.2433
+  appid=220  voted_up=True  count=14981  avg_help=0.0852  avg_play=1828.39  std=0.1943
+  appid=3590  voted_up=True  count=14251  avg_help=0.1367  avg_play=4058.91  std=0.2357
+  appid=500  voted_up=True  count=9137  avg_help=0.1638  avg_play=7295.15  std=0.2457
+  appid=420  voted_up=True  count=8591  avg_help=0.1548  avg_play=1111.97  std=0.2424
+  appid=2600  voted_up=True  count=6153  avg_help=0.2086  avg_play=2863.41  std=0.2671
+  appid=440  voted_up=True  count=5728  avg_help=0.1997  avg_play=54870.56  std=0.2526
+  appid=2280  voted_up=True  count=5602  avg_help=0.1972  avg_play=975.75  std=0.2639
+  appid=570  voted_up=True  count=5464  avg_help=0.1851  avg_play=139852.98  std=0.2438
+  appid=380  voted_up=True  count=5365  avg_help=0.1244  avg_play=895.27  std=0.2224
+  appid=50  voted_up=True  count=4908  avg_help=0.1447  avg_play=1704.12  std=0.2362
+  appid=300  voted_up=True  count=4320  avg_help=0.1979  avg_play=14770.56  std=0.2566
+[DONE]  Q3 — Multi-Attribute Grouping (appid x voted_up) — 0.569s
+
+
+[START] Q4 — Sorting & Ranking (top 10 games by engagement)
+  appid=730  avg_help=0.1905  total_reviews=976212  avg_play=65586.1  engagement=2062600.35
+  appid=550  avg_help=0.1389  total_reviews=103661  avg_play=10636.52  engagement=133505.07
+  appid=620  avg_help=0.11  total_reviews=87843  avg_play=2718.0  engagement=76413.06
+  appid=240  avg_help=0.1816  total_reviews=27880  avg_play=19682.41  engagement=50060.65
+  appid=10  avg_help=0.174  total_reviews=22313  avg_play=34249.3  engagement=40538.54
+  appid=1250  avg_help=0.1772  total_reviews=19573  avg_play=11060.58  engagement=32294.48
+  appid=70  avg_help=0.1534  total_reviews=23350  avg_play=2321.15  engagement=27760.54
+  appid=400  avg_help=0.1057  total_reviews=35797  avg_play=1137.54  engagement=26628.1
+  appid=3590  avg_help=0.142  total_reviews=14618  avg_play=4012.18  engagement=17223.25
+  appid=500  avg_help=0.1754  total_reviews=9646  avg_play=7105.79  engagement=15005.21
+[DONE]  Q4 — Sorting & Ranking (top 10 games by engagement) — 0.497s
+
+
+[START] Q5 — Window Rank (top review per game)
+  Games with a ranked top review: 96
+[DONE]  Q5 — Window Rank (top review per game) — 24.916s
+
+
+[START] Q6 — Moving Average (7-day review trend)
+  appid=10  day_epoch=14932  avg_7d=2.0
+  appid=10  day_epoch=14933  avg_7d=3.0
+  appid=10  day_epoch=14935  avg_7d=2.33
+  appid=10  day_epoch=14936  avg_7d=2.0
+  appid=10  day_epoch=14937  avg_7d=1.8
+  appid=10  day_epoch=14938  avg_7d=1.83
+  appid=10  day_epoch=14939  avg_7d=1.67
+  appid=10  day_epoch=14941  avg_7d=1.17
+  appid=10  day_epoch=14948  avg_7d=1.0
+  appid=10  day_epoch=14952  avg_7d=1.0
+  appid=10  day_epoch=14956  avg_7d=1.0
+  appid=10  day_epoch=14958  avg_7d=1.33
+  appid=10  day_epoch=14959  avg_7d=1.33
+  appid=10  day_epoch=14960  avg_7d=1.5
+  appid=10  day_epoch=14961  avg_7d=1.6
+[DONE]  Q6 — Moving Average (7-day review trend) — 1.015s
+
+
+  Global average helpfulness score: 0.1800
+
+[START] Q7 — Subquery (elite reviews in above-average games)
+  Matching reviews: 536
+  Global avg threshold: 0.1800
+[DONE]  Q7 — Subquery (elite reviews in above-average games) — 24.253s
+
+
+[START] Q8 — Broadcast Join (reviews x app metadata)
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=8549
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=25381
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=681
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=2071
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=36718
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=1108
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=2346
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=10149
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=1191
+  appid=10  app_name=Counter-Strike  genre=Action  voted_up=True  wvs=0.0  playtime=145
+[DONE]  Q8 — Broadcast Join (reviews x app metadata) — 4.082s
+
+
+[START] Q9 — Partition Pruning (2019 monthly summary)
+  year=2019  month=1  monthly_reviews=9883  avg_score=0.2154
+  year=2019  month=2  monthly_reviews=7992  avg_score=0.2089
+  year=2019  month=3  monthly_reviews=7482  avg_score=0.213
+  year=2019  month=4  monthly_reviews=6860  avg_score=0.2041
+  year=2019  month=5  monthly_reviews=7257  avg_score=0.209
+  year=2019  month=6  monthly_reviews=27294  avg_score=0.1344
+  year=2019  month=7  monthly_reviews=32505  avg_score=0.1212
+  year=2019  month=8  monthly_reviews=6140  avg_score=0.2157
+  year=2019  month=9  monthly_reviews=5358  avg_score=0.2072
+  year=2019  month=10  monthly_reviews=11274  avg_score=0.1512
+  year=2019  month=11  monthly_reviews=46972  avg_score=0.0994
+  year=2019  month=12  monthly_reviews=34620  avg_score=0.1001
+[DONE]  Q9 — Partition Pruning (2019 monthly summary) — 0.545s
+
+
+[START] Q10 — Sort-Merge Join (reviews x user profiles)
+  steamid=76561198011733201  user=VoidWalker  age=890  appid=10  voted_up=True  wvs=0.0  veteran=True
+  steamid=76561198107294407  user=NightStrike  age=1200  appid=10  voted_up=True  wvs=0.0  veteran=True
+[DONE]  Q10 — Sort-Merge Join (reviews x user profiles) — 59.099s
+
