@@ -1,0 +1,40 @@
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+WARNING: Using incubator modules: jdk.incubator.vector
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+26/04/25 23:51:51 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.209 instead (on interface eth0)
+26/04/25 23:51:51 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/04/25 23:51:52 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                          (0 + 1) / 1]                                                                                [Stage 2:>                                                          (0 + 1) / 1][Stage 3:==>                                                      (8 + 2) / 200][Stage 3:===>                                                    (12 + 2) / 200][Stage 3:====>                                                   (17 + 2) / 200][Stage 3:======>                                                 (23 + 2) / 200][Stage 3:========>                                               (30 + 2) / 200][Stage 3:=========>                                              (34 + 2) / 200][Stage 3:============>                                           (43 + 2) / 200][Stage 3:=============>                                          (49 + 3) / 200][Stage 3:===============>                                        (55 + 3) / 200][Stage 3:=================>                                      (63 + 2) / 200][Stage 3:====================>                                   (73 + 2) / 200][Stage 3:======================>                                 (80 + 2) / 200][Stage 3:========================>                               (86 + 2) / 200][Stage 3:==========================>                             (93 + 3) / 200][Stage 3:===========================>                           (100 + 2) / 200][Stage 3:=============================>                         (109 + 2) / 200][Stage 3:===============================>                       (115 + 2) / 200][Stage 3:=================================>                     (123 + 2) / 200][Stage 3:====================================>                  (131 + 2) / 200][Stage 3:======================================>                (141 + 2) / 200][Stage 3:========================================>              (149 + 4) / 200][Stage 3:==========================================>            (156 + 2) / 200][Stage 3:=============================================>         (166 + 2) / 200][Stage 3:==============================================>        (170 + 2) / 200][Stage 3:================================================>      (177 + 2) / 200][Stage 3:==================================================>    (182 + 2) / 200][Stage 3:====================================================>  (190 + 3) / 200]                                                                                [Stage 5:>                                                          (0 + 1) / 1]                                                                                [Stage 7:>                                                          (0 + 1) / 1]                                                                                [Stage 13:===========>                                           (40 + 2) / 200][Stage 13:=============>                                         (50 + 2) / 200][Stage 13:================>                                      (60 + 2) / 200][Stage 13:=======================>                               (84 + 2) / 200][Stage 13:============================>                         (104 + 2) / 200][Stage 13:=================================>                    (125 + 2) / 200][Stage 13:=======================================>              (145 + 2) / 200][Stage 13:============================================>         (164 + 2) / 200][Stage 13:=================================================>    (184 + 2) / 200]                                                                                [Stage 15:=============================>                            (1 + 1) / 2]                                                                                
+[INFO] Loading CSV ...
+
+  [CSV] Running benchmarks ...
+    Count           : 30.312s
+    Aggregation     : 11.694s
+    Complex Filter  : 5.704s
+    Column Scan     : 2.234s
+
+[INFO] Loading Parquet ...
+
+  [Parquet] Running benchmarks ...
+    Count           : 0.471s
+    Aggregation     : 3.218s
+    Complex Filter  : 1.857s
+    Column Scan     : 0.300s
+
+==============================================================
+            FILE FORMAT BENCHMARK: CSV vs PARQUET             
+==============================================================
+Benchmark       | CSV (s)    | Parquet (s)  | Speedup
+----------------|------------|--------------|--------
+Count           | 30.312     | 0.471        | 64.36x
+Aggregation     | 11.694     | 3.218        | 3.63x
+Complex Filter  | 5.704      | 1.857        | 3.07x
+Column Scan     | 2.234      | 0.300        | 7.45x
+==============================================================
+Overall: Parquet was 19.6x faster on average
+==============================================================
+
