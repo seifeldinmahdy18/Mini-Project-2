@@ -472,7 +472,7 @@ SELECT
     COUNT(*)                           AS monthly_reviews,
     ROUND(AVG(weighted_vote_score), 4) AS avg_score
 FROM reviews
-WHERE review_year IN (2022, 2023)
+WHERE review_year IN (2019)
 GROUP BY review_year, review_month
 ORDER BY review_year, review_month
 """
@@ -484,7 +484,7 @@ pruned_sql_df.explain(True)
 # After writing with partitionBy and re-reading:
 #   PartitionFilters: [review_year IN (2022, 2023)]
 
-with timer("Q9 — Partition Pruning (2022–2023 monthly summary)"):
+with timer("Q9 — Partition Pruning (2019 monthly summary)"):
     pruned_sql_df.show(24, truncate=False)
 
 

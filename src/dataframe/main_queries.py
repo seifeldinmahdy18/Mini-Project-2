@@ -315,8 +315,8 @@ daily_counts_df = (
 hype_window = (
     Window
     .partitionBy("appid")
-    .orderBy(F.col("review_date").cast("long"))
-    .rangeBetween(-(6 * 86_400), 0)
+    .orderBy(F.unix_date(F.col("review_date")))
+    .rangeBetween(-6, 0)
 )
 
 hype_trend_df = (
@@ -418,7 +418,7 @@ with timer("Q8 — Broadcast Join (reviews x app metadata)"):
 
 pruned_df = (
     reviews
-    .filter(F.col("review_year").isin(2022, 2023))
+    .filter(F.col("review_year").isin(2019))
     .groupBy("review_year", "review_month")
     .agg(
         F.count("*").alias("monthly_reviews"),
@@ -432,7 +432,7 @@ pruned_df.explain(True)
 # After writing with partitionBy and re-reading, the Physical Plan shows:
 #   PartitionFilters: [review_year IN (2022, 2023)]
 
-with timer("Q9 — Partition Pruning (2022–2023 monthly summary)"):
+with timer("Q9 — Partition Pruning (2019 monthly summary)"):
     pruned_df.show(24, truncate=False)
 
 

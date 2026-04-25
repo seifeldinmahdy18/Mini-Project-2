@@ -524,7 +524,7 @@ with timer("Q8 — Broadcast Join (reviews x app metadata)"):
 
 pruned_rdd = (
     reviews_rdd
-    .filter(lambda r: r[F_REVIEW_YEAR] in (2022, 2023))
+    .filter(lambda r: r[F_REVIEW_YEAR] in (2019,))
     .map(lambda r: (
         (r[F_REVIEW_YEAR], r[F_REVIEW_MONTH]),
         (r[F_WVS] or 0.0, 1),
@@ -539,7 +539,7 @@ pruned_rdd = (
     .sortBy(lambda r: (r[0], r[1]))
 )
 
-with timer("Q9 — Partition Pruning (2022–2023 monthly summary)"):
+with timer("Q9 — Partition Pruning (2019 monthly summary)"):
     for row in pruned_rdd.take(24):
         print(f"  year={row[0]}  month={row[1]}  "
               f"monthly_reviews={row[2]}  avg_score={row[3]}")
