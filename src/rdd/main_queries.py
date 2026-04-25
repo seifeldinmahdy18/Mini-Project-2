@@ -549,10 +549,13 @@ with timer("Q9 — Partition Pruning (2019 monthly summary)"):
 # QUERY 10 — SORT-MERGE JOIN
 # Goal: Join reviews with user_profiles on steamid.
 #
-# RDD cost: .join() on two RDDs always performs a full shuffle-sort (Exchange
-# hashpartitioning on both sides) followed by a merge pass. The DataFrame
-# pre-repartition optimisation (AQE detecting matching partitioning and
-# skipping one Exchange) is not available here — both sides always shuffle.
+# RDD .join() always performs a shuffle-based join equivalent to sort-merge —
+# there is no broadcast optimization in the RDD API, which is one of its key
+# limitations vs the structured APIs. Spark shuffles both RDDs by key and
+# merges matching partitions in lockstep, regardless of how small one side is.
+# The structured APIs (DataFrame/SQL) would auto-broadcast user_profiles (8
+# rows) unless explicitly prevented; the RDD API has no such planner and always
+# pays the full shuffle cost on both sides.
 # =============================================================================
 
 user_profiles_local = [

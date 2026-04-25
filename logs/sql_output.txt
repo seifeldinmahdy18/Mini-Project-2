@@ -2,13 +2,13 @@ Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base
 Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
 WARNING: Using incubator modules: jdk.incubator.vector
 Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
-26/04/25 22:15:51 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.61 instead (on interface eth0)
-26/04/25 22:15:51 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/04/25 23:48:42 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.209 instead (on interface eth0)
+26/04/25 23:48:42 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
 Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
 Setting default log level to "WARN".
 To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-26/04/25 22:15:52 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-[Stage 0:>                                                          (0 + 2) / 2][Stage 0:=============================>                             (1 + 1) / 2]                                                                                [Stage 4:=============================>                             (1 + 1) / 2]                                                                                [Stage 7:=============================>                             (1 + 1) / 2]                                                                                
+26/04/25 23:48:43 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                          (0 + 2) / 2][Stage 0:=============================>                             (1 + 1) / 2]                                                                                [Stage 4:=============================>                             (1 + 1) / 2]                                                                                [Stage 7:=============================>                             (1 + 1) / 2]                                                                                [Stage 10:=============================>                            (1 + 1) / 2]                                                                                
 --- Q1 Execution Plan (Complex Filter) ---
 == Parsed Logical Plan ==
 'Project ['steamid, 'appid, 'voted_up, 'votes_up, 'weighted_vote_score, 'playtime_forever, 'review, 'unix_timestamp_created, 'review_year]
@@ -39,7 +39,7 @@ Project [steamid#0L, appid#1, voted_up#2, votes_up#3, weighted_vote_score#5, pla
 
 [START] Q1 — Complex Filter
   Elite reviewers: 814
-[DONE]  Q1 — Complex Filter — 5.651s
+[DONE]  Q1 — Complex Filter — 5.295s
 
 
 [START] Q2 — Aggregation (avg helpfulness per game)
@@ -58,7 +58,7 @@ Project [steamid#0L, appid#1, voted_up#2, votes_up#3, weighted_vote_score#5, pla
 |2320 |0.2453         |1447         |1478.91          |5259          |
 +-----+---------------+-------------+-----------------+--------------+
 only showing top 10 rows
-[DONE]  Q2 — Aggregation (avg helpfulness per game) — 1.695s
+[DONE]  Q2 — Aggregation (avg helpfulness per game) — 1.540s
 
 
 [START] Q3 — Multi-Attribute Grouping (appid x voted_up)
@@ -87,7 +87,7 @@ only showing top 10 rows
 |300  |true    |4320        |0.1979         |14770.56         |0.2566       |
 +-----+--------+------------+---------------+-----------------+-------------+
 only showing top 20 rows
-[DONE]  Q3 — Multi-Attribute Grouping (appid x voted_up) — 1.930s
+[DONE]  Q3 — Multi-Attribute Grouping (appid x voted_up) — 1.518s
 
 
 [START] Q4 — Sorting & Ranking (top 10 games by engagement)
@@ -106,7 +106,7 @@ only showing top 20 rows
 |500  |0.1754         |9646         |7105.79          |15090         |15005.21        |
 +-----+---------------+-------------+-----------------+--------------+----------------+
 
-[DONE]  Q4 — Sorting & Ranking (top 10 games by engagement) — 0.900s
+[DONE]  Q4 — Sorting & Ranking (top 10 games by engagement) — 1.308s
 
 
 --- Q5 Execution Plan (Window Rank) ---
@@ -158,7 +158,7 @@ AdaptiveSparkPlan isFinalPlan=false
 
 [START] Q5 — Window Rank (top review per game)
   Games with a ranked top review: 96
-[DONE]  Q5 — Window Rank (top review per game) — 2.242s
+[DONE]  Q5 — Window Rank (top review per game) — 2.262s
 
 
 [START] Q6 — Moving Average (7-day review trend)
@@ -182,7 +182,7 @@ AdaptiveSparkPlan isFinalPlan=false
 |10   |2010-12-18 |2                 |1.43          |
 +-----+-----------+------------------+--------------+
 only showing top 15 rows
-[DONE]  Q6 — Moving Average (7-day review trend) — 2.030s
+[DONE]  Q6 — Moving Average (7-day review trend) — 2.361s
 
 
 --- Q7 Execution Plan (Subquery) ---
@@ -278,13 +278,13 @@ AdaptiveSparkPlan isFinalPlan=false
                   +- HashAggregate(keys=[appid#622], functions=[partial_avg(weighted_vote_score#626), partial_count(1)], output=[appid#622, sum#796, count#797L, count#798L])
                      +- Filter (isnotnull(weighted_vote_score#626) AND isnotnull(appid#622))
                         +- FileScan parquet [appid#622,weighted_vote_score#626] Batched: true, DataFilters: [isnotnull(weighted_vote_score#626), isnotnull(appid#622)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(weighted_vote_score), IsNotNull(appid)], ReadSchema: struct<appid:int,weighted_vote_score:float>
-26/04/25 22:16:18 WARN HintErrorLogger: Count not find relation 'app_metadata' specified in hint 'BROADCAST(app_metadata)'.
+[Stage 26:=============================>                            (1 + 1) / 2]                                                                                26/04/25 23:49:09 WARN HintErrorLogger: Count not find relation 'app_metadata' specified in hint 'BROADCAST(app_metadata)'.
 [Stage 38:=============================>                            (1 + 1) / 2]                                                                                [Stage 39:>                                                         (0 + 1) / 1]                                                                                
 
 [START] Q7 — Subquery (elite reviews in above-average games)
   Matching reviews: 536
   Global avg threshold: 0.1800
-[DONE]  Q7 — Subquery (elite reviews in above-average games) — 1.970s
+[DONE]  Q7 — Subquery (elite reviews in above-average games) — 2.122s
 
 
 --- Q8 Execution Plan (Broadcast Join) ---
@@ -346,11 +346,10 @@ AdaptiveSparkPlan isFinalPlan=false
 |10   |Counter-Strike|Action|true    |0.0                |105653          |
 +-----+--------------+------+--------+-------------------+----------------+
 only showing top 10 rows
-[DONE]  Q8 — Broadcast Join (reviews x app metadata) — 3.898s
+[DONE]  Q8 — Broadcast Join (reviews x app metadata) — 3.423s
 
 
 --- Q9 Execution Plan (Partition Pruning) ---
-26/04/25 22:16:23 WARN HintErrorLogger: Count not find relation 'user_profiles' specified in hint 'MERGE(user_profiles)'.
 == Parsed Logical Plan ==
 'Sort ['review_year ASC NULLS FIRST, 'review_month ASC NULLS FIRST], true
 +- 'Aggregate ['review_year, 'review_month], ['review_year, 'review_month, 'COUNT(1) AS monthly_reviews#1084, 'ROUND('AVG('weighted_vote_score), 4) AS avg_score#1085]
@@ -405,18 +404,17 @@ AdaptiveSparkPlan isFinalPlan=false
 |2019       |12          |34620          |0.1001   |
 +-----------+------------+---------------+---------+
 
-[DONE]  Q9 — Partition Pruning (2019 monthly summary) — 0.810s
+[DONE]  Q9 — Partition Pruning (2019 monthly summary) — 0.777s
 
 
 --- Q10 Execution Plan (Sort-Merge Join) ---
-[Stage 43:=============================>                            (1 + 1) / 2]                                                                                == Parsed Logical Plan ==
-'UnresolvedHint MERGE, ['user_profiles]
-+- 'Project ['r.steamid, 'u.username, 'u.account_age_days, 'u.total_reviews, 'r.appid, 'r.voted_up, 'r.weighted_vote_score, 'r.playtime_forever, ('u.account_age_days >= 365) AS is_veteran#1111]
-   +- 'Join Inner, ('r.steamid = 'u.steamid)
-      :- 'SubqueryAlias r
-      :  +- 'UnresolvedRelation [reviews], [], false
-      +- 'SubqueryAlias u
-         +- 'UnresolvedRelation [user_profiles], [], false
+[Stage 44:>                                                         (0 + 2) / 2][Stage 44:=============================>                            (1 + 1) / 2][Stage 47:>                                                         (0 + 1) / 1]                                                                                == Parsed Logical Plan ==
+'Project ['r.steamid, 'u.username, 'u.account_age_days, 'u.total_reviews, 'r.appid, 'r.voted_up, 'r.weighted_vote_score, 'r.playtime_forever, ('u.account_age_days >= 365) AS is_veteran#1111]
++- 'Join Inner, ('r.steamid = 'u.steamid)
+   :- 'SubqueryAlias r
+   :  +- 'UnresolvedRelation [reviews], [], false
+   +- 'SubqueryAlias u
+      +- 'UnresolvedRelation [user_profiles], [], false
 
 == Analyzed Logical Plan ==
 steamid: bigint, username: string, account_age_days: int, total_reviews: int, appid: int, voted_up: boolean, weighted_vote_score: float, playtime_forever: bigint, is_veteran: boolean
@@ -444,11 +442,14 @@ Project [steamid#0L, username#20, account_age_days#21, total_reviews#22, appid#1
 == Physical Plan ==
 AdaptiveSparkPlan isFinalPlan=false
 +- Project [steamid#0L, username#20, account_age_days#21, total_reviews#22, appid#1, voted_up#2, weighted_vote_score#5, playtime_forever#6L, (account_age_days#21 >= 365) AS is_veteran#1111]
-   +- BroadcastHashJoin [steamid#0L], [steamid#19L], Inner, BuildLeft, false
-      :- BroadcastExchange HashedRelationBroadcastMode(List(input[0, bigint, false]),false), [plan_id=1332]
-      :  +- Filter isnotnull(steamid#0L)
-      :     +- FileScan parquet [steamid#0L,appid#1,voted_up#2,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [isnotnull(steamid#0L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(steamid)], ReadSchema: struct<steamid:bigint,appid:int,voted_up:boolean,weighted_vote_score:float,playtime_forever:bigint>
-      +- Scan ExistingRDD[steamid#19L,username#20,account_age_days#21,total_reviews#22]
+   +- SortMergeJoin [steamid#0L], [steamid#19L], Inner
+      :- Sort [steamid#0L ASC NULLS FIRST], false, 0
+      :  +- Exchange hashpartitioning(steamid#0L, 200), ENSURE_REQUIREMENTS, [plan_id=1333]
+      :     +- Filter isnotnull(steamid#0L)
+      :        +- FileScan parquet [steamid#0L,appid#1,voted_up#2,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [isnotnull(steamid#0L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(steamid)], ReadSchema: struct<steamid:bigint,appid:int,voted_up:boolean,weighted_vote_score:float,playtime_forever:bigint>
+      +- Sort [steamid#19L ASC NULLS FIRST], false, 0
+         +- Exchange hashpartitioning(steamid#19L, 200), ENSURE_REQUIREMENTS, [plan_id=1334]
+            +- Scan ExistingRDD[steamid#19L,username#20,account_age_days#21,total_reviews#22]
 
 
 [START] Q10 — Sort-Merge Join (reviews x user profiles)
@@ -459,5 +460,5 @@ AdaptiveSparkPlan isFinalPlan=false
 |76561198011733201|VoidWalker |890             |42           |10   |true    |0.0                |25381           |true      |
 +-----------------+-----------+----------------+-------------+-----+--------+-------------------+----------------+----------+
 
-[DONE]  Q10 — Sort-Merge Join (reviews x user profiles) — 2.886s
+[DONE]  Q10 — Sort-Merge Join (reviews x user profiles) — 3.537s
 

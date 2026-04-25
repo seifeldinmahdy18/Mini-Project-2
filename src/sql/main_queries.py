@@ -492,17 +492,19 @@ with timer("Q9 — Partition Pruning (2019 monthly summary)"):
 # QUERY 10 — SORT-MERGE JOIN
 # Goal: Join reviews with user_profiles on steamid.
 #
-# Catalyst behaviour: /*+ MERGE(user_profiles) */ forces SortMergeJoin even
-# if user_profiles would otherwise qualify for broadcast. Both sides are
-# shuffled and sorted on steamid, then walked in lockstep. With
-# pre-repartitioning, AQE can detect matching partitioning and skip the
-# re-partition Exchange on that side.
+# Broadcast is disabled intentionally via autoBroadcastJoinThreshold = -1
+# so that Spark is forced to use SortMergeJoin. Without this, AQE would
+# automatically broadcast user_profiles (only 8 rows) and produce a
+# BroadcastHashJoin instead. Both sides are shuffled and sorted on steamid,
+# then walked in lockstep.
 # The Physical Plan shows:
 #   SortMergeJoin [steamid], [steamid], Inner
 # =============================================================================
 
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", "-1")
+
 Q10_SQL = """
-SELECT /*+ MERGE(user_profiles) */
+SELECT
     r.steamid,
     u.username,
     u.account_age_days,
@@ -525,6 +527,8 @@ sort_merge_joined_sql_df.explain(True)
 
 with timer("Q10 — Sort-Merge Join (reviews x user profiles)"):
     sort_merge_joined_sql_df.show(15, truncate=False)
+
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", str(50 * 1024 * 1024))
 
 
 # =============================================================================
