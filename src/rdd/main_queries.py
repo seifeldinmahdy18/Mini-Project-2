@@ -24,7 +24,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     StructType, StructField,
-    LongType, IntegerType, StringType, FloatType,
+    BooleanType, LongType, IntegerType, StringType, FloatType,
 )
 
 
@@ -61,7 +61,7 @@ sc = spark.sparkContext
 REVIEW_SCHEMA = StructType([
     StructField("steamid",                LongType(),    nullable=False),
     StructField("appid",                  IntegerType(), nullable=False),
-    StructField("voted_up",               StringType(),  nullable=True),
+    StructField("voted_up",               BooleanType(), nullable=True),
     StructField("votes_up",               IntegerType(), nullable=True),
     StructField("votes_funny",            LongType(),    nullable=True),
     StructField("weighted_vote_score",    FloatType(),   nullable=True),

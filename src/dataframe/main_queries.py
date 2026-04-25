@@ -16,7 +16,7 @@ from pyspark.sql import functions as F
 from pyspark.sql import Window
 from pyspark.sql.types import (
     StructType, StructField,
-    LongType, IntegerType, StringType, FloatType,
+    BooleanType, LongType, IntegerType, StringType, FloatType,
 )
 
 
@@ -52,14 +52,12 @@ spark.sparkContext.setLogLevel("WARN")
 # SCHEMAS
 # Defining schemas explicitly avoids Spark scanning the full dataset just
 # to infer types — an expensive no-op before any real work starts.
-# voted_up is loaded as StringType ("True"/"False") and cast to boolean
-# immediately after loading.
 # =============================================================================
 
 REVIEW_SCHEMA = StructType([
     StructField("steamid",                LongType(),    nullable=False),
     StructField("appid",                  IntegerType(), nullable=False),
-    StructField("voted_up",               StringType(),  nullable=True),
+    StructField("voted_up",               BooleanType(), nullable=True),
     StructField("votes_up",               IntegerType(), nullable=True),
     StructField("votes_funny",            LongType(),    nullable=True),
     StructField("weighted_vote_score",    FloatType(),   nullable=True),
@@ -97,7 +95,6 @@ reviews = (
     spark.read
     .schema(REVIEW_SCHEMA)
     .parquet(DATA_PATH)
-    .withColumn("voted_up",     F.lower(F.col("voted_up")).cast("boolean"))
     .withColumn("review_year",  F.year(F.to_timestamp("unix_timestamp_created")))
     .withColumn("review_month", F.month(F.to_timestamp("unix_timestamp_created")))
 )
