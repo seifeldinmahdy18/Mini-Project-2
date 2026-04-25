@@ -1,5 +1,5 @@
 # main_queries.py
-# Spark SQL API — 10 queries on 15.4M Steam Reviews
+# Spark SQL API — 10 queries on Steam Reviews
 # Dataset: kaggle.com/datasets/forgemaster/steam-reviews-dataset
 #
 # Spark SQL vs DataFrame trade-offs (global):
@@ -11,6 +11,12 @@
 #     subqueries / semi-joins — no extra Python round-trips.
 #   - Temp views are metadata-only; the underlying data is not copied.
 
+import os
+os.environ["JAVA_HOME"] = "/usr/local/sdkman/candidates/java/21.0.10-ms"
+os.environ["JAVA_TOOL_OPTIONS"] = (
+    "-Djava.security.manager=allow "
+    "--add-opens=java.base/javax.security.auth=ALL-UNNAMED"
+)
 import time
 from contextlib import contextmanager
 
@@ -18,7 +24,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
     StructType, StructField,
-    LongType, IntegerType, StringType, BooleanType, FloatType,
+    LongType, IntegerType, StringType, FloatType,
 )
 
 
@@ -28,7 +34,8 @@ from pyspark.sql.types import (
 
 spark = (
     SparkSession.builder
-    .appName("SteamReviews_SQL_Queries")
+    .appName("SteamReviews")
+
     .config("spark.sql.adaptive.enabled",                    "true")
     .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
     .config("spark.sql.adaptive.skewJoin.enabled",           "true")
@@ -51,27 +58,29 @@ spark.sparkContext.setLogLevel("WARN")
 # =============================================================================
 
 REVIEW_SCHEMA = StructType([
-    StructField("review_id",               LongType(),    nullable=False),
-    StructField("app_id",                  LongType(),    nullable=False),
-    StructField("author_steamid",          LongType(),    nullable=True),
-    StructField("language",                StringType(),  nullable=True),
-    StructField("review",                  StringType(),  nullable=True),
-    StructField("timestamp_created",       LongType(),    nullable=True),
-    StructField("recommended",             BooleanType(), nullable=True),
-    StructField("votes_helpful",           IntegerType(), nullable=True),
-    StructField("votes_funny",             IntegerType(), nullable=True),
-    StructField("weighted_vote_score",     FloatType(),   nullable=True),
-    StructField("author_playtime_forever", IntegerType(), nullable=True),
+    StructField("steamid",                LongType(),    nullable=False),
+    StructField("appid",                  IntegerType(), nullable=False),
+    StructField("voted_up",               StringType(),  nullable=True),
+    StructField("votes_up",               IntegerType(), nullable=True),
+    StructField("votes_funny",            LongType(),    nullable=True),
+    StructField("weighted_vote_score",    FloatType(),   nullable=True),
+    StructField("playtime_forever",       LongType(),    nullable=True),
+    StructField("playtime_at_review",     LongType(),    nullable=True),
+    StructField("num_games_owned",        IntegerType(), nullable=True),
+    StructField("num_reviews",            IntegerType(), nullable=True),
+    StructField("review",                 StringType(),  nullable=True),
+    StructField("unix_timestamp_created", LongType(),    nullable=True),
+    StructField("unix_timestamp_updated", LongType(),    nullable=True),
 ])
 
 APP_META_SCHEMA = StructType([
-    StructField("app_id",   LongType(),   nullable=False),
-    StructField("app_name", StringType(), nullable=True),
-    StructField("genre",    StringType(), nullable=True),
+    StructField("appid",    IntegerType(), nullable=False),
+    StructField("app_name", StringType(),  nullable=True),
+    StructField("genre",    StringType(),  nullable=True),
 ])
 
 USER_PROFILE_SCHEMA = StructType([
-    StructField("author_steamid",   LongType(),    nullable=False),
+    StructField("steamid",          LongType(),    nullable=False),
     StructField("username",         StringType(),  nullable=True),
     StructField("account_age_days", IntegerType(), nullable=True),
     StructField("total_reviews",    IntegerType(), nullable=True),
@@ -80,8 +89,9 @@ USER_PROFILE_SCHEMA = StructType([
 
 # =============================================================================
 # DATA LOADING & TEMP VIEW REGISTRATION
-# review_year / review_month are derived once in the base DataFrame so every
-# SQL query can reference them as plain columns without repeating the expression.
+# voted_up is cast to boolean immediately after loading.
+# review_year / review_month are derived once so every SQL query can reference
+# them as plain columns without repeating the expression.
 # =============================================================================
 
 DATA_PATH = "data/steam_reviews.parquet"
@@ -90,40 +100,34 @@ reviews = (
     spark.read
     .schema(REVIEW_SCHEMA)
     .parquet(DATA_PATH)
-    .withColumn("review_year",  F.year(F.to_timestamp("timestamp_created")))
-    .withColumn("review_month", F.month(F.to_timestamp("timestamp_created")))
+    .withColumn("voted_up",     F.lower(F.col("voted_up")).cast("boolean"))
+    .withColumn("review_year",  F.year(F.to_timestamp("unix_timestamp_created")))
+    .withColumn("review_month", F.month(F.to_timestamp("unix_timestamp_created")))
 )
 reviews.createOrReplaceTempView("reviews")
 
-# Small lookup tables — registered as views so SQL can reference them directly.
-app_metadata_df = spark.createDataFrame(
-    [
-        (440,     "Team Fortress 2",   "Action"),
-        (570,     "Dota 2",            "Strategy"),
-        (730,     "CS:GO",             "FPS"),
-        (578080,  "PUBG",              "Battle Royale"),
-        (1172620, "Sea of Thieves",    "Adventure"),
-        (1091500, "Cyberpunk 2077",    "RPG"),
-        (945360,  "Among Us",         "Social Deduction"),
-        (1422450, "Vampire Survivors", "Rogue-like"),
-    ],
-    schema=APP_META_SCHEMA,
-)
+app_metadata_df = spark.createDataFrame([
+    (10,      "Counter-Strike",    "Action"),
+    (570,     "Dota 2",            "Strategy"),
+    (730,     "CS:GO",             "FPS"),
+    (578080,  "PUBG",              "Battle Royale"),
+    (1172620, "Sea of Thieves",    "Adventure"),
+    (1091500, "Cyberpunk 2077",    "RPG"),
+    (945360,  "Among Us",          "Social Deduction"),
+    (1422450, "Vampire Survivors", "Rogue-like"),
+], schema=APP_META_SCHEMA)
 app_metadata_df.createOrReplaceTempView("app_metadata")
 
-user_profiles_df = spark.createDataFrame(
-    [
-        (76561198000000001, "NightStrike",  1200, 315),
-        (76561198000000002, "VoidWalker",   890,  42),
-        (76561198000000003, "CatalystKing", 2100, 178),
-        (76561198000000004, "LagSlayer",    450,  9),
-        (76561198000000005, "FrostByte",    3300, 501),
-        (76561198000000006, "GankMaster",   760,  88),
-        (76561198000000007, "SparkArcher",  1980, 234),
-        (76561198000000008, "ManaVault",    550,  61),
-    ],
-    schema=USER_PROFILE_SCHEMA,
-)
+user_profiles_df = spark.createDataFrame([
+    (76561198107294407, "NightStrike",  1200, 315),
+    (76561198011733201, "VoidWalker",   890,  42),
+    (76561198000000003, "CatalystKing", 2100, 178),
+    (76561198000000004, "LagSlayer",    450,  9),
+    (76561198000000005, "FrostByte",    3300, 501),
+    (76561198000000006, "GankMaster",   760,  88),
+    (76561198000000007, "SparkArcher",  1980, 234),
+    (76561198000000008, "ManaVault",    550,  61),
+], schema=USER_PROFILE_SCHEMA)
 user_profiles_df.createOrReplaceTempView("user_profiles")
 
 
@@ -153,21 +157,20 @@ def timer(label: str):
 
 Q1_SQL = """
 SELECT
-    review_id,
-    app_id,
-    author_steamid,
-    language,
-    review,
-    timestamp_created,
-    votes_helpful,
+    steamid,
+    appid,
+    voted_up,
+    votes_up,
     weighted_vote_score,
-    author_playtime_forever,
+    playtime_forever,
+    review,
+    unix_timestamp_created,
     review_year
 FROM reviews
-WHERE author_playtime_forever >= 3000
-  AND weighted_vote_score     >= 0.7
-  AND recommended             = TRUE
-  AND LENGTH(review)          >= 100
+WHERE playtime_forever    >= 3000
+  AND weighted_vote_score >= 0.7
+  AND voted_up            = TRUE
+  AND LENGTH(review)      >= 100
 """
 
 elite_sql_df = spark.sql(Q1_SQL)
@@ -187,25 +190,25 @@ with timer("Q1 — Complex Filter"):
 
 # =============================================================================
 # QUERY 2 — AGGREGATION
-# Goal: Compute average helpfulness, review count, and total helpful votes
-#       per game (only games with >= 50 reviews).
+# Goal: Compute average helpfulness, review count, avg playtime, and total
+#       votes_up per game (only games with >= 50 reviews).
 #
 # Catalyst behaviour: GROUP BY triggers a partial HashAggregate on each
 # executor before the shuffle. Only pre-aggregated partial results cross the
 # network, reducing shuffle bytes by 80–90%. HAVING is pushed into a Filter
-# node above the final aggregate — identical to the DataFrame .filter() call.
+# node above the final aggregate.
 # =============================================================================
 
 Q2_SQL = """
 SELECT
-    app_id,
-    ROUND(AVG(weighted_vote_score),    4) AS avg_helpfulness,
-    COUNT(review_id)                      AS total_reviews,
-    ROUND(AVG(author_playtime_forever), 2) AS avg_playtime_mins,
-    SUM(votes_helpful)                    AS total_votes_helpful
+    appid,
+    ROUND(AVG(weighted_vote_score), 4) AS avg_helpfulness,
+    COUNT(*)                           AS total_reviews,
+    ROUND(AVG(playtime_forever),    2) AS avg_playtime_mins,
+    SUM(votes_up)                      AS total_votes_up
 FROM reviews
-GROUP BY app_id
-HAVING COUNT(review_id) >= 50
+GROUP BY appid
+HAVING COUNT(*) >= 50
 """
 
 per_game_stats_sql_df = spark.sql(Q2_SQL)
@@ -217,33 +220,33 @@ with timer("Q2 — Aggregation (avg helpfulness per game)"):
 
 # =============================================================================
 # QUERY 3 — MULTI-ATTRIBUTE GROUPING
-# Goal: Group by language AND recommended to analyse cross-community sentiment.
+# Goal: Group by appid AND voted_up to analyse per-game sentiment.
 #
 # Catalyst behaviour: multi-column GROUP BY produces a wider shuffle key.
 # AQE detects post-shuffle partition sizes and coalesces small tasks,
-# avoiding the overhead of many near-empty reduce tasks — same as DataFrame.
+# avoiding the overhead of many near-empty reduce tasks.
 # STDDEV_POP is pushed into the partial aggregate phase where possible.
 # =============================================================================
 
 Q3_SQL = """
 SELECT
-    language,
-    recommended,
-    COUNT(review_id)                           AS review_count,
-    ROUND(AVG(weighted_vote_score),    4)      AS avg_helpfulness,
-    ROUND(AVG(author_playtime_forever), 2)     AS avg_playtime_mins,
-    ROUND(STDDEV_POP(weighted_vote_score), 4)  AS score_std_dev
+    appid,
+    voted_up,
+    COUNT(*)                              AS review_count,
+    ROUND(AVG(weighted_vote_score),    4) AS avg_helpfulness,
+    ROUND(AVG(playtime_forever),       2) AS avg_playtime_mins,
+    ROUND(STDDEV_POP(weighted_vote_score), 4) AS score_std_dev
 FROM reviews
-WHERE language    IS NOT NULL
-  AND recommended IS NOT NULL
-GROUP BY language, recommended
+WHERE voted_up IS NOT NULL
+  AND appid    IS NOT NULL
+GROUP BY appid, voted_up
 ORDER BY review_count DESC
 """
 
-by_language_sentiment_sql_df = spark.sql(Q3_SQL)
+by_app_sentiment_sql_df = spark.sql(Q3_SQL)
 
-with timer("Q3 — Multi-Attribute Grouping (language x recommendation)"):
-    by_language_sentiment_sql_df.show(20, truncate=False)
+with timer("Q3 — Multi-Attribute Grouping (appid x voted_up)"):
+    by_app_sentiment_sql_df.show(20, truncate=False)
 
 
 # =============================================================================
@@ -253,17 +256,16 @@ with timer("Q3 — Multi-Attribute Grouping (language x recommendation)"):
 #
 # Catalyst behaviour: ORDER BY + LIMIT is rewritten as TakeOrderedAndProject.
 # Each executor maintains a local top-K heap; only 10 rows per executor travel
-# to the driver — same optimisation as the DataFrame .orderBy().limit().
-# The per_game_stats view is already materialised (no re-scan).
+# to the driver. The per_game_stats view is already materialised (no re-scan).
 # =============================================================================
 
 Q4_SQL = """
 SELECT
-    app_id,
+    appid,
     avg_helpfulness,
     total_reviews,
     avg_playtime_mins,
-    total_votes_helpful,
+    total_votes_up,
     ROUND(total_reviews * avg_helpfulness * LN(avg_playtime_mins + 1), 2) AS engagement_score
 FROM per_game_stats
 ORDER BY engagement_score DESC
@@ -280,37 +282,32 @@ with timer("Q4 — Sorting & Ranking (top 10 games by engagement)"):
 # QUERY 5 — WINDOW FUNCTION: RANKING
 # Goal: Keep the single most influential review per game.
 #
-# Catalyst behaviour: RANK() OVER (PARTITION BY app_id ...) generates an
-# Exchange hashpartitioning(app_id) shuffle so all reviews for the same game
-# share one executor. AQE can split skewed partitions (games with millions of
-# reviews) across multiple tasks. The outer WHERE rank = 1 prunes rows after
-# the window is applied.
+# Catalyst behaviour: RANK() OVER (PARTITION BY appid ...) generates an
+# Exchange hashpartitioning(appid) shuffle so all reviews for the same game
+# share one executor. AQE can split skewed partitions across multiple tasks.
+# The outer WHERE filters to rank = 1 after the window is applied.
 # =============================================================================
 
 Q5_SQL = """
 SELECT
-    app_id,
-    review_id,
-    author_steamid,
-    language,
-    recommended,
+    appid,
+    steamid,
+    voted_up,
     weighted_vote_score,
-    votes_helpful,
-    author_playtime_forever,
+    votes_up,
+    playtime_forever,
     influence_rank
 FROM (
     SELECT
-        app_id,
-        review_id,
-        author_steamid,
-        language,
-        recommended,
+        appid,
+        steamid,
+        voted_up,
         weighted_vote_score,
-        votes_helpful,
-        author_playtime_forever,
+        votes_up,
+        playtime_forever,
         RANK() OVER (
-            PARTITION BY app_id
-            ORDER BY weighted_vote_score DESC, votes_helpful DESC
+            PARTITION BY appid
+            ORDER BY weighted_vote_score DESC, votes_up DESC
         ) AS influence_rank
     FROM reviews
     WHERE weighted_vote_score IS NOT NULL
@@ -322,8 +319,8 @@ top_review_per_game_sql_df = spark.sql(Q5_SQL)
 
 print("\n--- Q5 Execution Plan (Window Rank) ---")
 top_review_per_game_sql_df.explain(True)
-# Look for: Window [rank() OVER (PARTITION BY app_id ORDER BY ...)]
-#           Exchange hashpartitioning(app_id, 200)
+# Look for: Window [rank() OVER (PARTITION BY appid ORDER BY ...)]
+#           Exchange hashpartitioning(appid, 200)
 
 with timer("Q5 — Window Rank (top review per game)"):
     print(f"  Games with a ranked top review: {top_review_per_game_sql_df.count():,}")
@@ -334,40 +331,35 @@ with timer("Q5 — Window Rank (top review per game)"):
 # Goal: 7-day rolling average of daily review volume per game.
 #
 # Catalyst behaviour: the inner CTE pre-aggregates to daily counts first,
-# then the ROWS BETWEEN 6 PRECEDING AND CURRENT ROW window is applied on
-# the smaller result. This avoids running a range window over 15.4M raw rows
-# (which would cause large memory spill). Catalyst rewrites ROWS-based windows
-# more efficiently than RANGE-based ones when the order column is not a date.
-#
-# Note: ROWS BETWEEN 6 PRECEDING AND CURRENT ROW counts 7 rows (including the
-# current row), which is equivalent to the rangeBetween(-6*86400, 0) in the
-# DataFrame version. Both capture the current day plus the 6 preceding days.
+# then ROWS BETWEEN 6 PRECEDING AND CURRENT ROW is applied on the smaller
+# result. This avoids running a range window over the full raw dataset.
+# ROWS-based windows are more efficient than RANGE-based when ordering by date.
 # =============================================================================
 
 Q6_SQL = """
 WITH daily_counts AS (
     SELECT
-        app_id,
-        TO_DATE(TO_TIMESTAMP(timestamp_created)) AS review_date,
-        COUNT(review_id)                          AS daily_review_count
+        appid,
+        TO_DATE(TO_TIMESTAMP(unix_timestamp_created)) AS review_date,
+        COUNT(*)                                       AS daily_review_count
     FROM reviews
-    WHERE TO_DATE(TO_TIMESTAMP(timestamp_created)) IS NOT NULL
-    GROUP BY app_id, TO_DATE(TO_TIMESTAMP(timestamp_created))
+    WHERE TO_DATE(TO_TIMESTAMP(unix_timestamp_created)) IS NOT NULL
+    GROUP BY appid, TO_DATE(TO_TIMESTAMP(unix_timestamp_created))
 )
 SELECT
-    app_id,
+    appid,
     review_date,
     daily_review_count,
     ROUND(
         AVG(daily_review_count) OVER (
-            PARTITION BY app_id
+            PARTITION BY appid
             ORDER BY review_date
             ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
         ),
         2
     ) AS avg_7d_reviews
 FROM daily_counts
-ORDER BY app_id, review_date
+ORDER BY appid, review_date
 """
 
 hype_trend_sql_df = spark.sql(Q6_SQL)
@@ -383,36 +375,34 @@ with timer("Q6 — Moving Average (7-day review trend)"):
 #
 # Catalyst behaviour: the inner scalar subquery (global AVG) is computed in a
 # separate scan pass and its result is broadcast to the outer filter — the
-# dataset is not read twice. The EXISTS / IN subquery on per-game averages is
-# rewritten as a semi-join or hash join depending on cardinality statistics.
-# Look for a "Subquery" branch in the Physical Plan.
+# dataset is not read twice. The per-game HAVING subquery is rewritten as a
+# semi-join or hash join depending on cardinality statistics. Look for a
+# "Subquery" branch in the Physical Plan.
 # =============================================================================
 
 Q7_SQL = """
 SELECT
-    e.review_id,
-    e.app_id,
-    e.author_steamid,
-    e.language,
+    e.steamid,
+    e.appid,
     e.weighted_vote_score,
     g.game_avg_score,
-    e.author_playtime_forever
+    e.playtime_forever
 FROM elite_reviews e
 INNER JOIN (
     SELECT
-        app_id,
+        appid,
         ROUND(AVG(weighted_vote_score), 4) AS game_avg_score,
-        COUNT(review_id)                   AS game_review_count
+        COUNT(*)                           AS game_review_count
     FROM reviews
     WHERE weighted_vote_score IS NOT NULL
-    GROUP BY app_id
-    HAVING COUNT(review_id) >= 20
+    GROUP BY appid
+    HAVING COUNT(*) >= 20
        AND ROUND(AVG(weighted_vote_score), 4) > (
                SELECT AVG(weighted_vote_score)
                FROM reviews
                WHERE weighted_vote_score IS NOT NULL
            )
-) g ON e.app_id = g.app_id
+) g ON e.appid = g.appid
 """
 
 above_avg_elite_sql_df = spark.sql(Q7_SQL)
@@ -434,24 +424,23 @@ with timer("Q7 — Subquery (elite reviews in above-average games)"):
 # QUERY 8 — BROADCAST JOIN
 # Goal: Enrich reviews with game name and genre from a tiny lookup table.
 #
-# Catalyst behaviour: /*+ BROADCAST(app_metadata) */ tells the planner to
-# use BroadcastHashJoin regardless of the autoBroadcastJoinThreshold setting.
+# Catalyst behaviour: /*+ BROADCAST(app_metadata) */ tells the planner to use
+# BroadcastHashJoin regardless of the autoBroadcastJoinThreshold setting.
 # The metadata table is copied to every executor as a JVM-side hash table.
-# Each executor performs a local lookup — zero bytes cross the network for the
-# metadata side. Compare to a Sort-Merge Join where both sides shuffle.
+# Each executor performs a local lookup — zero bytes cross the network for
+# the metadata side.
 # =============================================================================
 
 Q8_SQL = """
 SELECT /*+ BROADCAST(app_metadata) */
-    r.app_id,
+    r.appid,
     a.app_name,
     a.genre,
-    r.review_id,
-    r.recommended,
+    r.voted_up,
     r.weighted_vote_score,
-    r.author_playtime_forever
+    r.playtime_forever
 FROM reviews r
-INNER JOIN app_metadata a ON r.app_id = a.app_id
+INNER JOIN app_metadata a ON r.appid = a.appid
 """
 
 broadcast_joined_sql_df = spark.sql(Q8_SQL)
@@ -481,8 +470,8 @@ Q9_SQL = """
 SELECT
     review_year,
     review_month,
-    COUNT(review_id)                      AS monthly_reviews,
-    ROUND(AVG(weighted_vote_score), 4)    AS avg_score
+    COUNT(*)                           AS monthly_reviews,
+    ROUND(AVG(weighted_vote_score), 4) AS avg_score
 FROM reviews
 WHERE review_year IN (2022, 2023)
 GROUP BY review_year, review_month
@@ -502,38 +491,37 @@ with timer("Q9 — Partition Pruning (2022–2023 monthly summary)"):
 
 # =============================================================================
 # QUERY 10 — SORT-MERGE JOIN
-# Goal: Join reviews with user_profiles on author_steamid.
+# Goal: Join reviews with user_profiles on steamid.
 #
 # Catalyst behaviour: /*+ MERGE(user_profiles) */ forces SortMergeJoin even
 # if user_profiles would otherwise qualify for broadcast. Both sides are
-# shuffled and sorted on author_steamid, then walked in lockstep. With
-# pre-repartitioning, AQE can detect that one side is already hash-partitioned
-# on the join key and skip the re-partition Exchange on that side.
+# shuffled and sorted on steamid, then walked in lockstep. With
+# pre-repartitioning, AQE can detect matching partitioning and skip the
+# re-partition Exchange on that side.
 # The Physical Plan shows:
-#   SortMergeJoin [author_steamid], [author_steamid], Inner
+#   SortMergeJoin [steamid], [steamid], Inner
 # =============================================================================
 
 Q10_SQL = """
 SELECT /*+ MERGE(user_profiles) */
-    r.author_steamid,
+    r.steamid,
     u.username,
     u.account_age_days,
     u.total_reviews,
-    r.app_id,
-    r.review_id,
-    r.recommended,
+    r.appid,
+    r.voted_up,
     r.weighted_vote_score,
-    r.author_playtime_forever,
-    (u.account_age_days >= 365) AS is_veteran_account
+    r.playtime_forever,
+    (u.account_age_days >= 365) AS is_veteran
 FROM reviews r
-INNER JOIN user_profiles u ON r.author_steamid = u.author_steamid
+INNER JOIN user_profiles u ON r.steamid = u.steamid
 """
 
 sort_merge_joined_sql_df = spark.sql(Q10_SQL)
 
 print("\n--- Q10 Execution Plan (Sort-Merge Join) ---")
 sort_merge_joined_sql_df.explain(True)
-# Look for: SortMergeJoin [author_steamid], [author_steamid], Inner
+# Look for: SortMergeJoin [steamid], [steamid], Inner
 #           Two Exchange hashpartitioning nodes (one per table).
 
 with timer("Q10 — Sort-Merge Join (reviews x user profiles)"):
