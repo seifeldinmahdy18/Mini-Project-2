@@ -1,0 +1,90 @@
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
+WARNING: Using incubator modules: jdk.incubator.vector
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+26/04/25 23:23:33 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.209 instead (on interface eth0)
+26/04/25 23:23:33 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/04/25 23:23:36 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 1) / 1]                                                                                [Stage 1:>                                                          (0 + 2) / 2]                                                                                
+=================================================================
+  PROFILE: DEFAULT
+=================================================================
+
+  Setting                                        Value
+  ---------------------------------------------- ────────────────────
+  spark.master                                   local[2]
+  spark.driver.memory                            4g
+  spark.executor.memory                          2g
+  spark.sql.shuffle.partitions                   200
+  spark.sql.adaptive.enabled                     true
+  spark.sql.adaptive.coalescePartitions.enabled  true
+  spark.sql.adaptive.skewJoin.enabled            true
+  spark.serializer                               org.apache.spark.serializer.KryoSerializer
+  spark.kryoserializer.buffer.max                512m
+  spark.sql.parquet.filterPushdown               true
+  spark.sql.parquet.mergeSchema                  false
+  spark.sql.autoBroadcastJoinThreshold           52428800
+  spark.memory.fraction                          0.8
+  spark.memory.storageFraction                   0.3
+
+  Reading: data/steam_reviews.parquet
+  Row count : 1,460,621
+  Time      : 7.474s
+
+=================================================================
+  PROFILE: LOW
+=================================================================
+
+  Setting                                        Value
+  ---------------------------------------------- ────────────────────
+  spark.master                                   local[1]
+  spark.driver.memory                            2g
+  spark.executor.memory                          1g
+  spark.sql.shuffle.partitions                   50
+  spark.sql.adaptive.enabled                     true
+  spark.sql.adaptive.coalescePartitions.enabled  true
+  spark.sql.adaptive.skewJoin.enabled            true
+  spark.serializer                               org.apache.spark.serializer.KryoSerializer
+  spark.kryoserializer.buffer.max                512m
+  spark.sql.parquet.filterPushdown               true
+  spark.sql.parquet.mergeSchema                  false
+  spark.sql.autoBroadcastJoinThreshold           52428800
+  spark.memory.fraction                          0.8
+  spark.memory.storageFraction                   0.3
+
+  Reading: data/steam_reviews.parquet
+  Row count : 1,460,621
+  Time      : 0.652s
+
+=================================================================
+  PROFILE: HIGH
+=================================================================
+
+  Setting                                        Value
+  ---------------------------------------------- ────────────────────
+  spark.master                                   local[*]
+  spark.driver.memory                            6g
+  spark.executor.memory                          3g
+  spark.sql.shuffle.partitions                   400
+  spark.sql.adaptive.enabled                     true
+  spark.sql.adaptive.coalescePartitions.enabled  true
+  spark.sql.adaptive.skewJoin.enabled            true
+  spark.serializer                               org.apache.spark.serializer.KryoSerializer
+  spark.kryoserializer.buffer.max                512m
+  spark.sql.parquet.filterPushdown               true
+  spark.sql.parquet.mergeSchema                  false
+  spark.sql.autoBroadcastJoinThreshold           52428800
+  spark.memory.fraction                          0.8
+  spark.memory.storageFraction                   0.3
+
+  Reading: data/steam_reviews.parquet
+  Row count : 1,460,621
+  Time      : 0.534s
+
+=================================================================
+  All profiles complete.
+=================================================================
+
