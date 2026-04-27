@@ -2,13 +2,13 @@ Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base
 Picked up JAVA_TOOL_OPTIONS: -Djava.security.manager=allow --add-opens=java.base/javax.security.auth=ALL-UNNAMED
 WARNING: Using incubator modules: jdk.incubator.vector
 Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
-26/04/25 23:47:32 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.209 instead (on interface eth0)
-26/04/25 23:47:32 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/04/27 07:09:09 WARN Utils: Your hostname, codespaces-ca41aa, resolves to a loopback address: 127.0.0.1; using 10.0.0.120 instead (on interface eth0)
+26/04/27 07:09:09 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
 Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
 Setting default log level to "WARN".
 To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-26/04/25 23:47:33 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-[Stage 0:>                                                          (0 + 2) / 2][Stage 0:=============================>                             (1 + 1) / 2]                                                                                [Stage 4:=============================>                             (1 + 1) / 2]                                                                                [Stage 7:=============================>                             (1 + 1) / 2]                                                                                
+26/04/27 07:09:11 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                          (0 + 2) / 2][Stage 0:=============================>                             (1 + 1) / 2]                                                                                
 --- Q1 Execution Plan (Complex Filter) ---
 == Parsed Logical Plan ==
 'Project ['steamid, 'appid, 'voted_up, 'votes_up, 'weighted_vote_score, 'playtime_forever, 'review, 'unix_timestamp_created, 'review_year]
@@ -45,7 +45,38 @@ Project [steamid#0L, appid#1, voted_up#2, votes_up#3, weighted_vote_score#5, pla
 
 [START] Q1 — Complex Filter
   Elite reviewers: 814
-[DONE]  Q1 — Complex Filter — 16.186s
+[DONE]  Q1 — Complex Filter — 15.676s
+
+
+--- Q2 Execution Plan (Aggregation) ---
+[Stage 4:=============================>                             (1 + 1) / 2]                                                                                == Parsed Logical Plan ==
+'Filter '`>=`('total_reviews, 50)
++- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+   +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+      +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+         +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Analyzed Logical Plan ==
+appid: int, avg_helpfulness: double, total_reviews: bigint, avg_playtime_mins: double, total_votes_up: bigint
+Filter (total_reviews#307L >= cast(50 as bigint))
++- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+   +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+      +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+         +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Optimized Logical Plan ==
+Filter (total_reviews#307L >= 50)
++- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+   +- Project [appid#1, votes_up#3, weighted_vote_score#5, playtime_forever#6L]
+      +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Filter (total_reviews#307L >= 50)
+   +- HashAggregate(keys=[appid#1], functions=[avg(weighted_vote_score#5), count(1), avg(playtime_forever#6L), sum(votes_up#3)], output=[appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L])
+      +- Exchange hashpartitioning(appid#1, 200), ENSURE_REQUIREMENTS, [plan_id=92]
+         +- HashAggregate(keys=[appid#1], functions=[partial_avg(weighted_vote_score#5), partial_count(1), partial_avg(playtime_forever#6L), partial_sum(votes_up#3)], output=[appid#1, sum#335, count#336L, count#337L, sum#338, count#339L, sum#340L])
+            +- FileScan parquet [appid#1,votes_up#3,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<appid:int,votes_up:int,weighted_vote_score:float,playtime_forever:bigint>
 
 
 [START] Q2 — Aggregation (avg helpfulness per game)
@@ -64,7 +95,45 @@ Project [steamid#0L, appid#1, voted_up#2, votes_up#3, weighted_vote_score#5, pla
 |2320 |0.2453         |1447         |1478.91          |5259          |
 +-----+---------------+-------------+-----------------+--------------+
 only showing top 10 rows
-[DONE]  Q2 — Aggregation (avg helpfulness per game) — 1.767s
+[DONE]  Q2 — Aggregation (avg helpfulness per game) — 1.883s
+
+
+--- Q3 Execution Plan (Multi-Attribute Grouping) ---
+== Parsed Logical Plan ==
+'Sort ['review_count DESC NULLS LAST], true
++- Aggregate [appid#1, voted_up#2], [appid#1, voted_up#2, count(1) AS review_count#367L, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#368, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#369, round(stddev(cast(weighted_vote_score#5 as double)), 4) AS score_std_dev#370]
+   +- Filter isnotnull(appid#1)
+      +- Filter isnotnull(voted_up#2)
+         +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+            +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+               +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Analyzed Logical Plan ==
+appid: int, voted_up: boolean, review_count: bigint, avg_helpfulness: double, avg_playtime_mins: double, score_std_dev: double
+Sort [review_count#367L DESC NULLS LAST], true
++- Aggregate [appid#1, voted_up#2], [appid#1, voted_up#2, count(1) AS review_count#367L, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#368, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#369, round(stddev(cast(weighted_vote_score#5 as double)), 4) AS score_std_dev#370]
+   +- Filter isnotnull(appid#1)
+      +- Filter isnotnull(voted_up#2)
+         +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+            +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+               +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Optimized Logical Plan ==
+Sort [review_count#367L DESC NULLS LAST], true
++- Aggregate [appid#1, voted_up#2], [appid#1, voted_up#2, count(1) AS review_count#367L, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#368, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#369, round(stddev(cast(weighted_vote_score#5 as double)), 4) AS score_std_dev#370]
+   +- Project [appid#1, voted_up#2, weighted_vote_score#5, playtime_forever#6L]
+      +- Filter (isnotnull(voted_up#2) AND isnotnull(appid#1))
+         +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [review_count#367L DESC NULLS LAST], true, 0
+   +- Exchange rangepartitioning(review_count#367L DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=193]
+      +- HashAggregate(keys=[appid#1, voted_up#2], functions=[count(1), avg(weighted_vote_score#5), avg(playtime_forever#6L), stddev(cast(weighted_vote_score#5 as double))], output=[appid#1, voted_up#2, review_count#367L, avg_helpfulness#368, avg_playtime_mins#369, score_std_dev#370])
+         +- Exchange hashpartitioning(appid#1, voted_up#2, 200), ENSURE_REQUIREMENTS, [plan_id=190]
+            +- HashAggregate(keys=[appid#1, voted_up#2], functions=[partial_count(1), partial_avg(weighted_vote_score#5), partial_avg(playtime_forever#6L), partial_stddev(cast(weighted_vote_score#5 as double))], output=[appid#1, voted_up#2, count#427L, sum#428, count#429L, sum#430, count#431L, n#411, avg#412, m2#413])
+               +- Filter (isnotnull(voted_up#2) AND isnotnull(appid#1))
+                  +- FileScan parquet [appid#1,voted_up#2,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [isnotnull(voted_up#2), isnotnull(appid#1)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(voted_up), IsNotNull(appid)], ReadSchema: struct<appid:int,voted_up:boolean,weighted_vote_score:float,playtime_forever:bigint>
 
 
 [START] Q3 — Multi-Attribute Grouping (appid x voted_up)
@@ -93,7 +162,52 @@ only showing top 10 rows
 |300  |true    |4320        |0.1979         |14770.56         |0.2566       |
 +-----+--------+------------+---------------+-----------------+-------------+
 only showing top 20 rows
-[Stage 13:=============================>                            (1 + 1) / 2]                                                                                [DONE]  Q3 — Multi-Attribute Grouping (appid x voted_up) — 1.655s
+[DONE]  Q3 — Multi-Attribute Grouping (appid x voted_up) — 1.208s
+
+
+--- Q4 Execution Plan (Sorting & Ranking) ---
+== Parsed Logical Plan ==
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [engagement_score#491 DESC NULLS LAST], true
+      +- Project [appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L, round(((cast(total_reviews#307L as double) * avg_helpfulness#306) * LOG1P(avg_playtime_mins#308)), 2) AS engagement_score#491]
+         +- Filter (total_reviews#307L >= cast(50 as bigint))
+            +- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+               +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+                  +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+                     +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Analyzed Logical Plan ==
+appid: int, avg_helpfulness: double, total_reviews: bigint, avg_playtime_mins: double, total_votes_up: bigint, engagement_score: double
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [engagement_score#491 DESC NULLS LAST], true
+      +- Project [appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L, round(((cast(total_reviews#307L as double) * avg_helpfulness#306) * LOG1P(avg_playtime_mins#308)), 2) AS engagement_score#491]
+         +- Filter (total_reviews#307L >= cast(50 as bigint))
+            +- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+               +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+                  +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+                     +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Optimized Logical Plan ==
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [engagement_score#491 DESC NULLS LAST], true
+      +- Project [appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L, round(((cast(total_reviews#307L as double) * avg_helpfulness#306) * LOG1P(avg_playtime_mins#308)), 2) AS engagement_score#491]
+         +- Filter (total_reviews#307L >= 50)
+            +- Aggregate [appid#1], [appid#1, round(avg(weighted_vote_score#5), 4) AS avg_helpfulness#306, count(1) AS total_reviews#307L, round(avg(playtime_forever#6L), 2) AS avg_playtime_mins#308, sum(votes_up#3) AS total_votes_up#309L]
+               +- Project [appid#1, votes_up#3, weighted_vote_score#5, playtime_forever#6L]
+                  +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- TakeOrderedAndProject(limit=10, orderBy=[engagement_score#491 DESC NULLS LAST], output=[appid#1,avg_helpfulness#306,total_reviews#307L,avg_playtime_mins#308,total_votes_up#309L,engagement_score#491])
+   +- Project [appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L, round(((cast(total_reviews#307L as double) * avg_helpfulness#306) * LOG1P(avg_playtime_mins#308)), 2) AS engagement_score#491]
+      +- Filter (total_reviews#307L >= 50)
+         +- HashAggregate(keys=[appid#1], functions=[avg(weighted_vote_score#5), count(1), avg(playtime_forever#6L), sum(votes_up#3)], output=[appid#1, avg_helpfulness#306, total_reviews#307L, avg_playtime_mins#308, total_votes_up#309L])
+            +- Exchange hashpartitioning(appid#1, 200), ENSURE_REQUIREMENTS, [plan_id=281]
+               +- HashAggregate(keys=[appid#1], functions=[partial_avg(weighted_vote_score#5), partial_count(1), partial_avg(playtime_forever#6L), partial_sum(votes_up#3)], output=[appid#1, sum#335, count#336L, count#337L, sum#338, count#339L, sum#340L])
+                  +- FileScan parquet [appid#1,votes_up#3,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<appid:int,votes_up:int,weighted_vote_score:float,playtime_forever:bigint>
 
 
 [START] Q4 — Sorting & Ranking (top 10 games by engagement)
@@ -112,11 +226,11 @@ only showing top 20 rows
 |500  |0.1754         |9646         |7105.79          |15090         |15005.21        |
 +-----+---------------+-------------+-----------------+--------------+----------------+
 
-[DONE]  Q4 — Sorting & Ranking (top 10 games by engagement) — 0.876s
+[DONE]  Q4 — Sorting & Ranking (top 10 games by engagement) — 0.670s
 
 
 --- Q5 Execution Plan (Window Rank) ---
-== Parsed Logical Plan ==
+[Stage 13:=============================>                            (1 + 1) / 2]                                                                                == Parsed Logical Plan ==
 'Project ['appid, 'steamid, 'voted_up, 'weighted_vote_score, 'votes_up, 'playtime_forever, 'influence_rank]
 +- Filter (influence_rank#521 = 1)
    +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, review_month#15, influence_rank#521]
@@ -157,7 +271,7 @@ AdaptiveSparkPlan isFinalPlan=false
       +- Window [rank(weighted_vote_score#5, votes_up#3) windowspecdefinition(appid#1, weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS influence_rank#521], [appid#1], [weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST]
          +- WindowGroupLimit [appid#1], [weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST], rank(weighted_vote_score#5, votes_up#3), 1, Final
             +- Sort [appid#1 ASC NULLS FIRST, weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST], false, 0
-               +- Exchange hashpartitioning(appid#1, 200), ENSURE_REQUIREMENTS, [plan_id=322]
+               +- Exchange hashpartitioning(appid#1, 200), ENSURE_REQUIREMENTS, [plan_id=394]
                   +- WindowGroupLimit [appid#1], [weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST], rank(weighted_vote_score#5, votes_up#3), 1, Partial
                      +- Sort [appid#1 ASC NULLS FIRST, weighted_vote_score#5 DESC NULLS LAST, votes_up#3 DESC NULLS LAST], false, 0
                         +- Filter isnotnull(weighted_vote_score#5)
@@ -166,11 +280,64 @@ AdaptiveSparkPlan isFinalPlan=false
 
 [START] Q5 — Window Rank (top review per game)
   Games with a ranked top review: 96
-[DONE]  Q5 — Window Rank (top review per game) — 2.072s
+[DONE]  Q5 — Window Rank (top review per game) — 1.952s
 
-[Stage 19:=============================>                            (1 + 1) / 2][Stage 24:>                                                         (0 + 1) / 1]                                                                                [Stage 29:=============================>                            (1 + 1) / 2]                                                                                [Stage 35:>                                                         (0 + 2) / 2]                                                                                
+[Stage 19:=============================>                            (1 + 1) / 2][Stage 24:>                                                         (0 + 1) / 1]                                                                                
+--- Q6 Execution Plan (Moving Average) ---
+== Parsed Logical Plan ==
+'Sort ['appid ASC NULLS FIRST, 'review_date ASC NULLS FIRST], true
++- Project [appid#1, review_date#611, daily_review_count#612L, avg_7d_reviews#630]
+   +- Project [appid#1, review_date#611, daily_review_count#612L, _w0#632, _we0#633, round(_we0#633, 2) AS avg_7d_reviews#630]
+      +- Window [avg(daily_review_count#612L) windowspecdefinition(appid#1, _w0#632 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, cast(-6 as int), currentrow$())) AS _we0#633], [appid#1], [_w0#632 ASC NULLS FIRST]
+         +- Project [appid#1, review_date#611, daily_review_count#612L, unix_date(review_date#611) AS _w0#632]
+            +- Aggregate [appid#1, review_date#611], [appid#1, review_date#611, count(1) AS daily_review_count#612L]
+               +- Filter isnotnull(review_date#611)
+                  +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, review_month#15, to_date(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true), None, Some(Etc/UTC), true) AS review_date#611]
+                     +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+                        +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+                           +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Analyzed Logical Plan ==
+appid: int, review_date: date, daily_review_count: bigint, avg_7d_reviews: double
+Sort [appid#1 ASC NULLS FIRST, review_date#611 ASC NULLS FIRST], true
++- Project [appid#1, review_date#611, daily_review_count#612L, avg_7d_reviews#630]
+   +- Project [appid#1, review_date#611, daily_review_count#612L, _w0#632, _we0#633, round(_we0#633, 2) AS avg_7d_reviews#630]
+      +- Window [avg(daily_review_count#612L) windowspecdefinition(appid#1, _w0#632 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, cast(-6 as int), currentrow$())) AS _we0#633], [appid#1], [_w0#632 ASC NULLS FIRST]
+         +- Project [appid#1, review_date#611, daily_review_count#612L, unix_date(review_date#611) AS _w0#632]
+            +- Aggregate [appid#1, review_date#611], [appid#1, review_date#611, count(1) AS daily_review_count#612L]
+               +- Filter isnotnull(review_date#611)
+                  +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, review_month#15, to_date(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true), None, Some(Etc/UTC), true) AS review_date#611]
+                     +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, month(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_month#15]
+                        +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, year(cast(to_timestamp(unix_timestamp_created#11L, None, TimestampType, Some(Etc/UTC), true) as date)) AS review_year#14]
+                           +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Optimized Logical Plan ==
+Sort [appid#1 ASC NULLS FIRST, review_date#611 ASC NULLS FIRST], true
++- Project [appid#1, review_date#611, daily_review_count#612L, round(_we0#633, 2) AS avg_7d_reviews#630]
+   +- Window [avg(daily_review_count#612L) windowspecdefinition(appid#1, _w0#632 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, -6, currentrow$())) AS _we0#633], [appid#1], [_w0#632 ASC NULLS FIRST]
+      +- Aggregate [appid#1, review_date#611], [appid#1, review_date#611, count(1) AS daily_review_count#612L, unix_date(review_date#611) AS _w0#632]
+         +- Project [appid#1, cast(cast(unix_timestamp_created#11L as timestamp) as date) AS review_date#611]
+            +- Filter (isnotnull(unix_timestamp_created#11L) AND isnotnull(cast(cast(unix_timestamp_created#11L as timestamp) as date)))
+               +- Relation [steamid#0L,appid#1,voted_up#2,votes_up#3,votes_funny#4L,weighted_vote_score#5,playtime_forever#6L,playtime_at_review#7L,num_games_owned#8,num_reviews#9,review#10,unix_timestamp_created#11L,unix_timestamp_updated#12L] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [appid#1 ASC NULLS FIRST, review_date#611 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(appid#1 ASC NULLS FIRST, review_date#611 ASC NULLS FIRST, 200), ENSURE_REQUIREMENTS, [plan_id=614]
+      +- Project [appid#1, review_date#611, daily_review_count#612L, round(_we0#633, 2) AS avg_7d_reviews#630]
+         +- Window [avg(daily_review_count#612L) windowspecdefinition(appid#1, _w0#632 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, -6, currentrow$())) AS _we0#633], [appid#1], [_w0#632 ASC NULLS FIRST]
+            +- Sort [appid#1 ASC NULLS FIRST, _w0#632 ASC NULLS FIRST], false, 0
+               +- Exchange hashpartitioning(appid#1, 200), ENSURE_REQUIREMENTS, [plan_id=609]
+                  +- HashAggregate(keys=[appid#1, review_date#611], functions=[count(1)], output=[appid#1, review_date#611, daily_review_count#612L, _w0#632])
+                     +- Exchange hashpartitioning(appid#1, review_date#611, 200), ENSURE_REQUIREMENTS, [plan_id=606]
+                        +- HashAggregate(keys=[appid#1, review_date#611], functions=[partial_count(1)], output=[appid#1, review_date#611, count#635L])
+                           +- Project [appid#1, cast(cast(unix_timestamp_created#11L as timestamp) as date) AS review_date#611]
+                              +- Filter (isnotnull(unix_timestamp_created#11L) AND isnotnull(cast(cast(unix_timestamp_created#11L as timestamp) as date)))
+                                 +- FileScan parquet [appid#1,unix_timestamp_created#11L] Batched: true, DataFilters: [isnotnull(unix_timestamp_created#11L), isnotnull(cast(cast(unix_timestamp_created#11L as timesta..., Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(unix_timestamp_created)], ReadSchema: struct<appid:int,unix_timestamp_created:bigint>
+
+
 [START] Q6 — Moving Average (7-day review trend)
-+-----+-----------+------------------+--------------+
+[Stage 35:>                                                         (0 + 2) / 2][Stage 35:=============================>                            (1 + 1) / 2]                                                                                +-----+-----------+------------------+--------------+
 |appid|review_date|daily_review_count|avg_7d_reviews|
 +-----+-----------+------------------+--------------+
 |10   |2010-11-19 |2                 |2.0           |
@@ -190,7 +357,7 @@ AdaptiveSparkPlan isFinalPlan=false
 |10   |2010-12-18 |2                 |1.6           |
 +-----+-----------+------------------+--------------+
 only showing top 15 rows
-[DONE]  Q6 — Moving Average (7-day review trend) — 2.863s
+[DONE]  Q6 — Moving Average (7-day review trend) — 2.553s
 
 
   Global average helpfulness score: 0.1800
@@ -198,7 +365,7 @@ only showing top 15 rows
 [START] Q7 — Subquery (elite reviews in above-average games)
   Matching reviews: 536
   Global avg threshold: 0.1800
-[DONE]  Q7 — Subquery (elite reviews in above-average games) — 1.331s
+[DONE]  Q7 — Subquery (elite reviews in above-average games) — 0.802s
 
 
 --- Q8 Execution Plan (Broadcast Join) ---
@@ -237,7 +404,7 @@ AdaptiveSparkPlan isFinalPlan=false
    +- BroadcastHashJoin [appid#1], [appid#16], Inner, BuildRight, false
       :- Filter isnotnull(appid#1)
       :  +- FileScan parquet [appid#1,voted_up#2,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [isnotnull(appid#1)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(appid)], ReadSchema: struct<appid:int,voted_up:boolean,weighted_vote_score:float,playtime_forever:bigint>
-      +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=985]
+      +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=1094]
          +- Scan ExistingRDD[appid#16,app_name#17,genre#18]
 
 
@@ -257,11 +424,11 @@ AdaptiveSparkPlan isFinalPlan=false
 |10   |Counter-Strike|Action|true    |0.0                |145             |
 +-----+--------------+------+--------+-------------------+----------------+
 only showing top 10 rows
-[DONE]  Q8 — Broadcast Join (reviews x app metadata) — 2.019s
+[DONE]  Q8 — Broadcast Join (reviews x app metadata) — 2.436s
 
 
 --- Q9 Execution Plan (Partition Pruning) ---
-[Stage 37:=============================>                            (1 + 1) / 2]                                                                                == Parsed Logical Plan ==
+== Parsed Logical Plan ==
 'Sort ['review_year ASC NULLS FIRST, 'review_month ASC NULLS FIRST], true
 +- Aggregate [review_year#14, review_month#15], [review_year#14, review_month#15, count(1) AS monthly_reviews#978L, round(avg(weighted_vote_score#5), 4) AS avg_score#979]
    +- Filter review_year#14 IN (2019)
@@ -288,9 +455,9 @@ Sort [review_year#14 ASC NULLS FIRST, review_month#15 ASC NULLS FIRST], true
 == Physical Plan ==
 AdaptiveSparkPlan isFinalPlan=false
 +- Sort [review_year#14 ASC NULLS FIRST, review_month#15 ASC NULLS FIRST], true, 0
-   +- Exchange rangepartitioning(review_year#14 ASC NULLS FIRST, review_month#15 ASC NULLS FIRST, 200), ENSURE_REQUIREMENTS, [plan_id=1082]
+   +- Exchange rangepartitioning(review_year#14 ASC NULLS FIRST, review_month#15 ASC NULLS FIRST, 200), ENSURE_REQUIREMENTS, [plan_id=1191]
       +- HashAggregate(keys=[review_year#14, review_month#15], functions=[count(1), avg(weighted_vote_score#5)], output=[review_year#14, review_month#15, monthly_reviews#978L, avg_score#979])
-         +- Exchange hashpartitioning(review_year#14, review_month#15, 200), ENSURE_REQUIREMENTS, [plan_id=1079]
+         +- Exchange hashpartitioning(review_year#14, review_month#15, 200), ENSURE_REQUIREMENTS, [plan_id=1188]
             +- HashAggregate(keys=[review_year#14, review_month#15], functions=[partial_count(1), partial_avg(weighted_vote_score#5)], output=[review_year#14, review_month#15, count#1000L, sum#1001, count#1002L])
                +- Project [weighted_vote_score#5, year(cast(cast(unix_timestamp_created#11L as timestamp) as date)) AS review_year#14, month(cast(cast(unix_timestamp_created#11L as timestamp) as date)) AS review_month#15]
                   +- Filter (isnotnull(unix_timestamp_created#11L) AND (year(cast(cast(unix_timestamp_created#11L as timestamp) as date)) = 2019))
@@ -315,11 +482,11 @@ AdaptiveSparkPlan isFinalPlan=false
 |2019       |12          |34620          |0.1001   |
 +-----------+------------+---------------+---------+
 
-[DONE]  Q9 — Partition Pruning (2019 monthly summary) — 0.887s
+[DONE]  Q9 — Partition Pruning (2019 monthly summary) — 0.746s
 
 
 --- Q10 Execution Plan (Sort-Merge Join) ---
-[Stage 40:>                                                         (0 + 2) / 2][Stage 40:>                 (0 + 2) / 2][Stage 41:>                 (0 + 0) / 2][Stage 41:>                                                         (0 + 2) / 2][Stage 41:=============================>                            (1 + 1) / 2]                                                                                [Stage 53:=============>                                         (24 + 3) / 100][Stage 53:===================>                                   (35 + 2) / 100][Stage 53:==========================>                            (49 + 3) / 100][Stage 53:=================================>                     (60 + 2) / 100][Stage 53:====================================>                  (67 + 2) / 100][Stage 53:=======================================>               (72 + 3) / 100][Stage 53:============================================>          (81 + 2) / 100][Stage 53:===============================================>       (87 + 3) / 100]                                                                                [Stage 56:==================>                                     (25 + 2) / 75][Stage 56:=========================>                              (34 + 2) / 75][Stage 56:=====================================>                  (50 + 2) / 75][Stage 56:=============================================>          (61 + 2) / 75][Stage 56:=====================================================>  (71 + 2) / 75]                                                                                == Parsed Logical Plan ==
+[Stage 41:=============================>                            (1 + 1) / 2]                                                                                [Stage 53:===================>                                   (36 + 2) / 100][Stage 53:=============================>                         (54 + 2) / 100][Stage 53:=====================================>                 (69 + 2) / 100][Stage 53:==========================================>            (77 + 2) / 100][Stage 53:=============================================>         (83 + 2) / 100][Stage 53:=====================================================> (97 + 2) / 100]                                                                                [Stage 56:================>                                       (22 + 2) / 75][Stage 56:===============================>                        (42 + 2) / 75][Stage 56:=========================================>              (55 + 2) / 75][Stage 56:===================================================>    (69 + 2) / 75]                                                                                == Parsed Logical Plan ==
 'Project [unresolvedstarwithcolumns(is_veteran, '`>=`('account_age_days, 365), None)]
 +- Project [steamid#0L, username#20, account_age_days#21, total_reviews#22, appid#1, voted_up#2, weighted_vote_score#5, playtime_forever#6L]
    +- Project [steamid#0L, appid#1, voted_up#2, votes_up#3, votes_funny#4L, weighted_vote_score#5, playtime_forever#6L, playtime_at_review#7L, num_games_owned#8, num_reviews#9, review#10, unix_timestamp_created#11L, unix_timestamp_updated#12L, review_year#14, review_month#15, username#20, account_age_days#21, total_reviews#22]
@@ -356,11 +523,11 @@ AdaptiveSparkPlan isFinalPlan=false
 +- Project [steamid#0L, username#20, account_age_days#21, total_reviews#22, appid#1, voted_up#2, weighted_vote_score#5, playtime_forever#6L, (account_age_days#21 >= 365) AS is_veteran#1020]
    +- SortMergeJoin [steamid#0L], [steamid#19L], Inner
       :- Sort [steamid#0L ASC NULLS FIRST], false, 0
-      :  +- Exchange hashpartitioning(steamid#0L, 200), REPARTITION_BY_NUM, [plan_id=1182]
+      :  +- Exchange hashpartitioning(steamid#0L, 200), REPARTITION_BY_NUM, [plan_id=1291]
       :     +- Filter isnotnull(steamid#0L)
       :        +- FileScan parquet [steamid#0L,appid#1,voted_up#2,weighted_vote_score#5,playtime_forever#6L] Batched: true, DataFilters: [isnotnull(steamid#0L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/workspaces/Mini-Project-2/data/steam_reviews.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(steamid)], ReadSchema: struct<steamid:bigint,appid:int,voted_up:boolean,weighted_vote_score:float,playtime_forever:bigint>
       +- Sort [steamid#19L ASC NULLS FIRST], false, 0
-         +- Exchange hashpartitioning(steamid#19L, 200), ENSURE_REQUIREMENTS, [plan_id=1186]
+         +- Exchange hashpartitioning(steamid#19L, 200), ENSURE_REQUIREMENTS, [plan_id=1295]
             +- Scan ExistingRDD[steamid#19L,username#20,account_age_days#21,total_reviews#22]
 
 
@@ -372,5 +539,5 @@ AdaptiveSparkPlan isFinalPlan=false
 |76561198011733201|VoidWalker |890             |42           |10   |true    |0.0                |25381           |true      |
 +-----------------+-----------+----------------+-------------+-----+--------+-------------------+----------------+----------+
 
-[DONE]  Q10 — Sort-Merge Join (reviews x user profiles) — 6.974s
+[DONE]  Q10 — Sort-Merge Join (reviews x user profiles) — 4.711s
 

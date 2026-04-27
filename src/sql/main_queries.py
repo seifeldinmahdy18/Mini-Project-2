@@ -210,11 +210,14 @@ GROUP BY appid
 HAVING COUNT(*) >= 50
 """
 
-per_game_stats_sql_df = spark.sql(Q2_SQL)
-per_game_stats_sql_df.createOrReplaceTempView("per_game_stats")
+q2_df = spark.sql(Q2_SQL)
+q2_df.createOrReplaceTempView("per_game_stats")
+
+print("\n--- Q2 Execution Plan (Aggregation) ---")
+q2_df.explain(True)
 
 with timer("Q2 — Aggregation (avg helpfulness per game)"):
-    per_game_stats_sql_df.show(10, truncate=False)
+    q2_df.show(10, truncate=False)
 
 
 # =============================================================================
@@ -242,10 +245,13 @@ GROUP BY appid, voted_up
 ORDER BY review_count DESC
 """
 
-by_app_sentiment_sql_df = spark.sql(Q3_SQL)
+q3_df = spark.sql(Q3_SQL)
+
+print("\n--- Q3 Execution Plan (Multi-Attribute Grouping) ---")
+q3_df.explain(True)
 
 with timer("Q3 — Multi-Attribute Grouping (appid x voted_up)"):
-    by_app_sentiment_sql_df.show(20, truncate=False)
+    q3_df.show(20, truncate=False)
 
 
 # =============================================================================
@@ -271,10 +277,13 @@ ORDER BY engagement_score DESC
 LIMIT 10
 """
 
-top10_games_sql_df = spark.sql(Q4_SQL)
+q4_df = spark.sql(Q4_SQL)
+
+print("\n--- Q4 Execution Plan (Sorting & Ranking) ---")
+q4_df.explain(True)
 
 with timer("Q4 — Sorting & Ranking (top 10 games by engagement)"):
-    top10_games_sql_df.show(10, truncate=False)
+    q4_df.show(10, truncate=False)
 
 
 # =============================================================================
@@ -361,10 +370,13 @@ FROM daily_counts
 ORDER BY appid, review_date
 """
 
-hype_trend_sql_df = spark.sql(Q6_SQL)
+q6_df = spark.sql(Q6_SQL)
+
+print("\n--- Q6 Execution Plan (Moving Average) ---")
+q6_df.explain(True)
 
 with timer("Q6 — Moving Average (7-day review trend)"):
-    hype_trend_sql_df.show(15, truncate=False)
+    q6_df.show(15, truncate=False)
 
 
 # =============================================================================

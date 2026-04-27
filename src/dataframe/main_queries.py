@@ -199,6 +199,9 @@ per_game_stats_df = (
     .filter(F.col("total_reviews") >= 50)
 )
 
+print("\n--- Q2 Execution Plan (Aggregation) ---")
+per_game_stats_df.explain(True)
+
 with timer("Q2 — Aggregation (avg helpfulness per game)"):
     per_game_stats_df.show(10, truncate=False)
 
@@ -227,6 +230,9 @@ by_app_sentiment_df = (
     .orderBy(F.col("review_count").desc())
 )
 
+print("\n--- Q3 Execution Plan (Multi-Attribute Grouping) ---")
+by_app_sentiment_df.explain(True)
+
 with timer("Q3 — Multi-Attribute Grouping (appid x voted_up)"):
     by_app_sentiment_df.show(20, truncate=False)
 
@@ -253,6 +259,9 @@ top10_games_df = (
     .orderBy(F.col("engagement_score").desc())
     .limit(10)
 )
+
+print("\n--- Q4 Execution Plan (Sorting & Ranking) ---")
+top10_games_df.explain(True)
 
 with timer("Q4 — Sorting & Ranking (top 10 games by engagement)"):
     top10_games_df.show(10, truncate=False)
@@ -324,6 +333,9 @@ hype_trend_df = (
     .withColumn("avg_7d_reviews", F.round(F.avg("daily_review_count").over(hype_window), 2))
     .orderBy("appid", "review_date")
 )
+
+print("\n--- Q6 Execution Plan (Moving Average) ---")
+hype_trend_df.explain(True)
 
 with timer("Q6 — Moving Average (7-day review trend)"):
     hype_trend_df.show(15, truncate=False)
